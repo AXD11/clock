@@ -1,0 +1,164 @@
+<html>
+    <body>
+        <canvas id="clock" width="400" height="400" style="background-color: white">
+        </canvas>
+    
+        <script>
+          var canvas = document.getElementById("clock");
+          var ctx = canvas.getContext("2d");
+          let radius = canvas.height / 2;
+          ctx.translate(radius, radius);
+          radius = radius * 0.9;
+          setInterval(drawClock, 1);
+    
+          function drawClock() {
+            drawFace(ctx, radius);
+            drawRomanNumbers(ctx, radius);
+            drawTime(ctx, radius);
+          }
+    
+          function drawFace(ctx, radius) {
+            
+            var grad = ctx.createRadialGradient(
+              0,
+              0,
+              radius * 0.95,
+              0,
+              0,
+              radius * 1.05
+            );
+            grad.addColorStop(0, "blue");
+            grad.addColorStop(0.5, "purple");
+            grad.addColorStop(1, "cyan");
+            
+                ctx.beginPath();
+                ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = "white";
+                ctx.fill();
+                
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = radius * 0.1;
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.arc(0, 0, radius * 0.05, 0, 2 * Math.PI);
+                ctx.fillStyle = "blue";
+                ctx.fill();
+            
+    
+            // Draw clock scale
+            ctx.lineWidth = radius * 0.02;
+            for (let i = 0; i < 60; i++) {
+              let angle = (i * Math.PI) / 30;
+              if (i % 5 == 0) {
+                ctx.lineWidth = radius * 0.02;
+                ctx.beginPath();
+                ctx.moveTo(radius * Math.cos(angle), radius * Math.sin(angle));
+                ctx.lineTo(
+                  (radius - radius * 0.15) * Math.cos(angle),
+                  (radius - radius * 0.15) * Math.sin(angle)
+                );
+                ctx.strokeStyle = "black";
+                ctx.stroke();
+              } else {
+                ctx.lineWidth = radius * 0.01;
+                ctx.beginPath();
+                ctx.moveTo(radius * Math.cos(angle), radius * Math.sin(angle));
+                ctx.lineTo(
+                  (radius - radius * 0.1) * Math.cos(angle),
+                  (radius - radius * 0.1) * Math.sin(angle)
+                );
+                ctx.strokeStyle = "black";
+                ctx.stroke();
+              }
+            }
+          }
+    
+          function drawRomanNumbers(ctx, radius) {
+            radius = radius * 0.9;
+            ctx.font = radius * 0.15 + "px arial";
+            ctx.textBaseline = "middle";
+            ctx.textAlign = "center";
+            for (let num = 1; num < 13; num++) {
+              let ang = (num * Math.PI) / 6;
+              ctx.rotate(ang);
+              ctx.translate(0, -radius * 0.8);
+              
+              ctx.fillText(convertToRoman(num), 0, 0);
+              
+              ctx.translate(0, radius * 0.8);
+              ctx.rotate(-ang);
+            }
+          }
+    
+          function drawTime(ctx, radius) {
+            var now = new Date();
+            let hour = now.getHours();
+            let minute = now.getMinutes();
+            let second = now.getSeconds();
+            let msecond = now.getMilliseconds();
+            ctx.fillText(hour+":"+minute+":"+second,70,20);
+            //hour
+            hour = hour % 12;
+            hour =
+              (hour * Math.PI) / 6 +
+              (minute * Math.PI) / (6 * 60) +
+              (second * Math.PI) / (360 * 60);
+            drawHand(ctx, hour, radius * 0.5, radius * 0.07,"purple");
+            //minute
+            minute = (minute * Math.PI) / 30 + (second * Math.PI) / (30 * 60);
+            drawHand(ctx, minute, radius * 0.8, radius * 0.07,"black");
+            // second
+            second = (second * Math.PI) / 30;
+            drawHand(ctx, second, radius * 0.9, radius * 0.02, "red");
+            //m second
+            msecond = (msecond * Math.PI)/500;
+            drawHand(ctx, msecond, radius * 0.9, radius * 0.01, "green");
+          }
+    
+          function drawHand(ctx, pos, length, width, color) {
+            length = length*0.8;
+            ctx.beginPath();
+            ctx.lineWidth = width;
+            ctx.lineCap = "square";
+            ctx.moveTo(0, 0);
+            ctx.rotate(pos);
+            ctx.strokeStyle = color;
+            ctx.lineTo(0, -length);
+            ctx.stroke();
+            ctx.rotate(-pos);
+          }
+    
+          function convertToRoman(num) {
+            let roman = "";
+            const romanNumList = {
+              M: 1000,
+              CM: 900,
+              D: 500,
+              CD: 400,
+              C: 100,
+              XC: 90,
+              L: 50,
+              XL: 40,
+              X: 10,
+              IX: 9,
+              V: 5,
+              IV: 4,
+              I: 1,
+            };
+            let a;
+            for (let key in romanNumList) {
+              a = Math.floor(num / romanNumList[key]);
+              if (a >= 0) {
+                for (let i = 0; i < a; i++) {
+                  roman += key;
+                }
+              }
+              num = num % romanNumList[key];
+            }
+            return roman;
+          }
+
+        </script>
+    </body>
+</html>
